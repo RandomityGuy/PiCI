@@ -13,7 +13,7 @@ print("build <app_name>: build app with name <app_name>")
 print("tail <app_name>: tail log of app with name <app_name>")
 print("exit: exit pici")
 
-os.makedirs('.pici/')
+os.makedirs('.pici/', exist_ok=True)
 
 apps: list[app.App] = []
 
