@@ -47,16 +47,15 @@ class App:
 
     def build(self):
         # Build the shit
+        self.setup_outputs()
         if not os.path.exists('.pici/apps/' + self.name):
             print('PICI: Building app')
             os.makedirs('.pici/apps/' + self.name, exist_ok=True)
-            self.setup_outputs()
             self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=self.stdout, stderr=self.stderr)
             self.buildproc.wait()
             with open('.picigit', 'w') as f:
                 print(self.git, file=f)
         else:
-            self.setup_outputs()
             old_git = None
             with open('.picigit', 'r') as f:
                 old_git = f.read()
@@ -89,14 +88,15 @@ class App:
         self.close_outputs()
 
     def tail(self):
-        tailproc = subprocess.Popen(['/usr/bin/tail', '-f', '.pici/apps/' + self.name + '/logs/out.log'])
+        tailproc = subprocess.Popen(['/usr/bin/tail', '-f', '.pici/outputs/' + self.name + '.out.log'])
         tailproc.wait()
 
     def setup_outputs(self):
+        os.makedirs('.pici/outputs/' + self.name, exist_ok=True)
         if self.stdout == None:
-            self.stdout = open('.pici/apps/' + self.name + '/out.log', 'a')
+            self.stdout = open('.pici/outputs/' + self.name + '.out.log', 'a')
         if self.stderr == None:
-            self.stderr = open('.pici/apps/' + self.name + '/err.log', 'a')
+            self.stderr = open('.pici/outputs/' + self.name + '.err.log', 'a')
 
     def close_outputs(self):
         if self.stdout != None:

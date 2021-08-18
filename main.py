@@ -32,8 +32,8 @@ while True:
         print("Apps:")
         # Get directories in .pici/
         toprint = []
-        for path in os.listdir('.pici/'):
-            if os.path.isdir(os.path.join('.pici/', path)):
+        for path in os.listdir('.pici/apps'):
+            if os.path.isdir(os.path.join('.pici/apps', path)):
                 toprint.append(path)
         for a in apps:
             if a.name not in toprint:
