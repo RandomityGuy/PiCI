@@ -1,4 +1,4 @@
-import os, subprocess, shlex, shutil, json;
+import os, subprocess, shlex, shutil, json, sys;
 
 
 class DomainConfig:
@@ -45,13 +45,17 @@ class App:
             return False
         return True
 
-    def build(self):
+    def build(self, outputHere = True):
         # Build the shit
         self.setup_outputs()
+
+        appstdout = self.stdout if not outputHere else sys.stdout
+        appstderr = self.stderr if not outputHere else sys.stderr
+
         if not os.path.exists('.pici/apps/' + self.name):
             print('PICI: Building app')
             os.makedirs('.pici/apps/' + self.name, exist_ok=True)
-            self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=self.stdout, stderr=self.stderr)
+            self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=appstdout, stderr=appstderr)
             self.buildproc.wait()
             with open('.picigit', 'w') as f:
                 print(self.git, file=f)
@@ -62,17 +66,17 @@ class App:
             if old_git != self.git:
                 print('PICI: Rebuilding app')
                 shutil.rmtree('.pici/apps/' + self.name)
-                self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=self.stdout, stderr=self.stderr)
+                self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=appstdout, stderr=appstderr)
                 self.buildproc.wait()
                 with open('.picigit', 'w') as f:
                     print(self.git, file=f)
             else:
                 print('PICI: Pulling changes')
-                self.buildproc = subprocess.Popen(['/usr/bin/git', 'pull'], cwd='.pici/apps/' + self.name, stdout=self.stdout, stderr=self.stderr)
+                self.buildproc = subprocess.Popen(['/usr/bin/git', 'pull'], cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr)
                 self.buildproc.wait()
                 
         print("PICI: Running build command")
-        self.buildproc = subprocess.Popen(shlex.split(self.build_command), stdout=self.stdout, stderr=self.stderr)
+        self.buildproc = subprocess.Popen(shlex.split(self.build_command), cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr)
         self.buildproc.wait()
         self.generate_nginx_conf()
         self.close_outputs()
@@ -81,7 +85,7 @@ class App:
     def start(self):
         print("PICI: Starting app")
         self.setup_outputs()
-        self.startproc = subprocess.Popen(shlex.split(self.start_command), stdout=self.stdout, stderr=self.stderr)
+        self.startproc = subprocess.Popen(shlex.split(self.start_command), cwd='.pici/apps/' + self.name, stdout=self.stdout, stderr=self.stderr)
 
     def stop(self):
         self.startproc.kill()
@@ -92,7 +96,7 @@ class App:
         tailproc.wait()
 
     def setup_outputs(self):
-        os.makedirs('.pici/outputs/' + self.name, exist_ok=True)
+        os.makedirs('.pici/outputs/', exist_ok=True)
         if self.stdout == None:
             self.stdout = open('.pici/outputs/' + self.name + '.out.log', 'a')
         if self.stderr == None:
