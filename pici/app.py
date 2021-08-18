@@ -47,15 +47,16 @@ class App:
 
     def build(self):
         # Build the shit
-        self.setup_outputs()
         if not os.path.exists('.pici/apps/' + self.name):
             print('PICI: Building app')
             os.makedirs('.pici/apps/' + self.name, exist_ok=True)
+            self.setup_outputs()
             self.buildproc = subprocess.Popen(['/usr/bin/git', 'clone', self.git, '.pici/apps/' + self.name], stdout=self.stdout, stderr=self.stderr)
             self.buildproc.wait()
             with open('.picigit', 'w') as f:
                 print(self.git, file=f)
         else:
+            self.setup_outputs()
             old_git = None
             with open('.picigit', 'r') as f:
                 old_git = f.read()

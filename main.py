@@ -13,7 +13,7 @@ print("build <app_name>: build app with name <app_name>")
 print("tail <app_name>: tail log of app with name <app_name>")
 print("exit: exit pici")
 
-os.makedirs('.pici/', exist_ok=True)
+os.makedirs('.pici/apps', exist_ok=True)
 
 apps: list[app.App] = []
 
@@ -31,13 +31,20 @@ while True:
     if cmd_args[0] == "apps":
         print("Apps:")
         # Get directories in .pici/
+        toprint = []
         for path in os.listdir('.pici/'):
             if os.path.isdir(os.path.join('.pici/', path)):
-                print(path)
+                toprint.append(path)
+        for a in apps:
+            if a.name not in toprint:
+                toprint.append(a.name)
+        for a in toprint:
+            print(a)
     if cmd_args[0] == "list":
         print("Running apps:")
         for a in apps:
-            print(a.name)
+            if a.startproc != None:
+                print(a.name)
     if cmd_args[0] == "start":
         if len(cmd_args) == 2:
             # Get app
