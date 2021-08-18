@@ -95,7 +95,9 @@ class App:
         print("PiCI: Stopped app")
 
     def tail(self):
-        tailproc = subprocess.Popen(['/usr/bin/tail', '-f', '.pici/outputs/' + self.name + '.out.log'], stdout=sys.stdout, stderr=sys.stderr, stdin=sys.stdin)
+        tailproc = subprocess.Popen(['/usr/bin/tail', '-f', '.pici/outputs/' + self.name + '.out.log'], stdout=subprocess.PIPE, stdin=sys.stdin)
+        for line in tailproc.stdout:
+            print(line)
         tailproc.wait()
 
     def setup_outputs(self):
