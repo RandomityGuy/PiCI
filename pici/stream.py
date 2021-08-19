@@ -36,8 +36,8 @@ class Stream:
             rstreams, _, _ = select.select(self._iomap.keys(), [], [])
             for stream in rstreams:
                 line = stream.readline()
-                print(time.strftime("[ %Y-%m-%d %H:%M:%S ]:", time.localtime()).encode(), file = self._iomap[stream], end='')
-                print(line, end='', file = self._iomap[stream])
+                self._iomap[stream].write(time.strftime("[ %Y-%m-%d %H:%M:%S ]:", time.localtime()).encode())
+                self._iomap[stream].write(line)
             if all(proc.process.poll() is not None for proc in self.processes):
                 break
         self._iomap.clear()
