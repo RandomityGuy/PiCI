@@ -97,13 +97,14 @@ class App:
         print("PiCI: Stopped app")
 
     def tail(self):
-        tailproc = subprocess.Popen(['/usr/bin/tail', '-f', '.pici/outputs/' + self.name + '.out.log'], stdout=subprocess.PIPE, stdin=sys.stdin)
-        try:
-            for line in iter(tailproc.stdout.readline, b''):
-                print(line)
-            tailproc.wait()
-        except KeyboardInterrupt:
-            tailproc.terminate()
+        outputstream.tail_process(self.startproc)
+        while True:
+            try:
+                inp = input()
+                if inp == 'q':
+                    break
+            except KeyboardInterrupt:
+                break
 
     def setup_outputs(self):
         os.makedirs('.pici/outputs/', exist_ok=True)
