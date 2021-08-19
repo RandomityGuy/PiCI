@@ -20,6 +20,7 @@ class Stream:
     def __init__(self):
         self.processes = []
         self._iomap = {}
+        self._thread = None
     
     def append_process(self, process: subprocess.Popen, out: FileIO, err: FileIO):
         self.processes.append(StreamProcess(process, out, err))
@@ -35,8 +36,8 @@ class Stream:
             rstreams, _, _ = select.select(self._iomap.keys(), [], [])
             for stream in rstreams:
                 line = stream.readline()
-                print(time.strftime("[ %Y-%m-%d %H:%M:%S ]:", time.localtime()), file = self._iomap[stream], end='')
-                print(line.decode(), end='', file = self._iomap[stream])
+                print(time.strftime("[ %Y-%m-%d %H:%M:%S ]:", time.localtime()).encode(), file = self._iomap[stream], end='')
+                print(line, end='', file = self._iomap[stream])
             if all(proc.process.poll() is not None for proc in self.processes):
                 break
         self._iomap.clear()
