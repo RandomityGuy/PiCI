@@ -49,8 +49,11 @@ class Stream:
         self._iomap.clear()
         self.processes.clear()
 
-    def tail_process(self, process: StreamProcess):
-        self._tailprocess = process
+    def tail_process(self, process: subprocess.Popen):
+        for proc in self.processes:
+            if proc.process == process:
+                self._tailprocess = proc
+                break
 
     def remove_tail_process(self):
         self._tailprocess = None
