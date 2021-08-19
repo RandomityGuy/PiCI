@@ -1,4 +1,5 @@
 import os, subprocess, shlex, shutil, json, sys;
+from pici import outputstream;
 
 
 class DomainConfig:
@@ -85,7 +86,8 @@ class App:
     def start(self):
         print("PiCI: Starting app")
         self.setup_outputs()
-        self.startproc = subprocess.Popen(shlex.split(self.start_command), cwd='.pici/apps/' + self.name, stdout=self.stdout, stderr=self.stderr)
+        self.startproc = subprocess.Popen(shlex.split(self.start_command), cwd='.pici/apps/' + self.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        outputstream.append_process(self.startproc, self.stdout, self.stderr)
         print("PiCI: Started app")
 
     def stop(self):
@@ -106,7 +108,7 @@ class App:
     def setup_outputs(self):
         os.makedirs('.pici/outputs/', exist_ok=True)
         if self.stdout == None:
-            self.stdout = open('.pici/outputs/' + self.name + '.out.log', 'a')
+            self.stdout = open('.pici/outputs/' + self.name + '.out.log', 'a', buffering=0)
         if self.stderr == None:
             self.stderr = open('.pici/outputs/' + self.name + '.err.log', 'a')
 
