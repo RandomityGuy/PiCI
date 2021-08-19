@@ -46,6 +46,9 @@ class App:
             return False
         return True
 
+    def is_running(self):
+        return self.startproc != None and self.startproc.poll() == None
+
     def build(self, outputHere = True):
         # Build the shit
         self.setup_outputs()
@@ -105,6 +108,7 @@ class App:
                     break
             except KeyboardInterrupt:
                 break
+        outputstream.remove_tail_process()
 
     def setup_outputs(self):
         os.makedirs('.pici/outputs/', exist_ok=True)

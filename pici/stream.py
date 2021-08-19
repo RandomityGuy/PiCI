@@ -43,7 +43,7 @@ class Stream:
                 self._iomap[stream].write(line)
                 if self._tailprocess != None:
                     if self._tailprocess.out == self._iomap[stream] or self._tailprocess.err == self._iomap[stream]:
-                        print(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()) + line.decode())
+                        print(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()) + line.decode(), end="")
             if all(proc.process.poll() is not None for proc in self.processes):
                 break
         self._iomap.clear()

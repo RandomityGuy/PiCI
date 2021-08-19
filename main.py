@@ -32,6 +32,7 @@ for config in os.listdir('.pici/configs'):
 while True:
     cmd = input(">>> ")
     cmd_args = cmd.split(" ")
+
     if cmd_args[0] == "help":
         print("Commands:")
         print("help: show help")
@@ -45,6 +46,7 @@ while True:
         print("output <app_name>: output log of app with name <app_name>")
         print("error <app_name>: error log of app with name <app_name>")
         print("exit: exit PiCI")
+
     if cmd_args[0] == "load":
         if len(cmd_args) == 2:
             thisapp = app.App()
@@ -54,6 +56,7 @@ while True:
                 shutil.copy(cmd_args[1], '.pici/configs/' + thisapp.name + '.json')
             else:
                 print("Error loading " + cmd_args[1])
+
     if cmd_args[0] == "apps":
         print("Apps:")
         # Get directories in .pici/
@@ -66,11 +69,13 @@ while True:
                 toprint.append(a.name)
         for a in toprint:
             print(a)
+
     if cmd_args[0] == "list":
         print("Running apps:")
         for a in apps:
-            if a.startproc != None:
+            if a.is_running():
                 print(a.name)
+
     if cmd_args[0] == "start":
         if len(cmd_args) == 2:
             # Get app
