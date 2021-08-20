@@ -113,9 +113,9 @@ class App:
 
     def setup_outputs(self):
         os.makedirs('.pici/outputs/', exist_ok=True)
-        if self.stdout == None:
+        if self.stdout == None or self.stdout.closed:
             self.stdout = open('.pici/outputs/' + self.name + '.out.log', 'ab', buffering=0)
-        if self.stderr == None:
+        if self.stderr == None or self.stdout.closed:
             self.stderr = open('.pici/outputs/' + self.name + '.err.log', 'ab', buffering=0)
 
     def close_outputs(self):
