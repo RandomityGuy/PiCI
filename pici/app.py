@@ -80,7 +80,7 @@ class App:
                 self.buildproc.wait()
                 
         print("PiCI: Running build command")
-        self.buildproc = subprocess.Popen(shlex.split(self.build_command), cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr)
+        self.buildproc = subprocess.Popen(shlex.split(self.build_command), cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr, shell=True)
         self.buildproc.wait()
         self.generate_nginx_conf()
         self.close_outputs()
