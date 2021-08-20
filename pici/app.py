@@ -97,6 +97,7 @@ class App:
         print("PiCI: Stopping app")
         self.startproc.terminate()
         self.startproc.wait()
+        outputstream.wait_process_io(self.startproc)
         self.close_outputs()
         print("PiCI: Stopped app")
 

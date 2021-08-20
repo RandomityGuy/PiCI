@@ -4,6 +4,7 @@ import threading
 import select
 import time
 from dataclasses import dataclass
+from typing import Tuple
 
 @dataclass
 class StreamProcess:
@@ -17,6 +18,7 @@ class Stream:
     _iomap: dict[FileIO, FileIO]
 
     _tailprocess: StreamProcess
+    _iowaits: list[Tuple[subprocess.Popen, threading.Condition]]
 
 
     def __init__(self):
@@ -24,6 +26,7 @@ class Stream:
         self._iomap = {}
         self._thread = None
         self._tailprocess = None
+        self._iowaits = []
     
     def append_process(self, process: subprocess.Popen, out: FileIO, err: FileIO):
         self.processes.append(StreamProcess(process, out, err))
@@ -44,6 +47,11 @@ class Stream:
                 if self._tailprocess != None:
                     if self._tailprocess.out == self._iomap[stream] or self._tailprocess.err == self._iomap[stream]:
                         print(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()) + line.decode(), end="")
+            for (proc, condition) in self._iowaits:
+                if proc.poll() is not None:
+                    condition.acquire()
+                    condition.notify()
+                    condition.release()
             if all(proc.process.poll() is not None for proc in self.processes):
                 break
         self._iomap.clear()
@@ -54,6 +62,18 @@ class Stream:
             if proc.process == process:
                 self._tailprocess = proc
                 break
+
+    def wait_process_io(self, process: subprocess.Popen):
+        for proc in self.processes:
+            if proc.process == process:
+                condition = threading.Condition()
+                condition.acquire()
+                item = (proc, condition)
+                self._iowaits.append(item)
+                condition.wait()
+                self._iowaits.remove(item)
+                condition.release()
+                break 
 
     def remove_tail_process(self):
         self._tailprocess = None
