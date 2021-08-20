@@ -18,7 +18,7 @@ class Stream:
     _iomap: dict[FileIO, FileIO]
 
     _tailprocess: StreamProcess
-    _iowaits: list[Tuple[subprocess.Popen, threading.Condition]]
+    _iowaits: list[Tuple[StreamProcess, threading.Condition]]
 
 
     def __init__(self):
@@ -48,7 +48,7 @@ class Stream:
                     if self._tailprocess.out == self._iomap[stream] or self._tailprocess.err == self._iomap[stream]:
                         print(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()) + line.decode(), end="")
             for (proc, condition) in self._iowaits:
-                if proc.poll() is not None:
+                if proc.process.poll() is not None:
                     condition.acquire()
                     condition.notify()
                     condition.release()
