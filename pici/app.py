@@ -80,7 +80,7 @@ class App:
                 self.buildproc.wait()
                 
         print("PiCI: Running build command")
-        self.buildproc = subprocess.Popen(shlex.split(self.build_command), cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr)
+        self.buildproc = subprocess.Popen(shlex.split(self.build_command), cwd='.pici/apps/' + self.name, stdout=appstdout, stderr=appstderr, shell=True)
         self.buildproc.wait()
         self.generate_nginx_conf()
         self.close_outputs()
@@ -89,7 +89,7 @@ class App:
     def start(self):
         print("PiCI: Starting app")
         self.setup_outputs()
-        self.startproc = subprocess.Popen(shlex.split(self.start_command), cwd='.pici/apps/' + self.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.startproc = subprocess.Popen(shlex.split(self.start_command), cwd='.pici/apps/' + self.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         outputstream.append_process(self.startproc, self.stdout, self.stderr)
         print("PiCI: Started app")
 
