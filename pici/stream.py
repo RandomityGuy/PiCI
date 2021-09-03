@@ -3,6 +3,8 @@ import subprocess
 import threading
 import select
 import time
+import glob
+import gzip
 from dataclasses import dataclass
 from typing import Tuple
 
@@ -44,6 +46,17 @@ class Stream:
                 line = stream.readline()
                 self._iomap[stream].write(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()).encode())
                 self._iomap[stream].write(line)
+                if self._iomap[stream].tell() > 5 * 1024 * 1024:
+                    self._iomap[stream].flush()
+
+                    logcount = len(glob.glob(self._iomap[stream].name + ".*.gz"))
+                    with gzip.open(self._iomap[stream].name + ".%d.gz" % logcount, "wb") as gz:
+                        # Compress with python gz module
+                        with open(self._iomap[stream].name, "rb") as f:
+                            content = f.read()
+                            gz.write(content)
+                    self._iomap[stream].truncate(0)
+                    self._iomap[stream].seek(0)
                 if self._tailprocess != None:
                     if self._tailprocess.out == self._iomap[stream] or self._tailprocess.err == self._iomap[stream]:
                         print(time.strftime("[ %Y-%m-%d %H:%M:%S ]: ", time.localtime()) + line.decode(), end="")

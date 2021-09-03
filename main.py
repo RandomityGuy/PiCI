@@ -11,6 +11,7 @@ print("apps: list available apps")
 print("list: list running apps")
 print("start <app_name>: start app with name <app_name>")
 print("stop <app_name>: stop app with name <app_name>")
+print("reload <app_name>: reload app with name <app_name>")
 print("build <app_name> [-s]: build app with name <app_name>, -s: silent")
 print("tail <app_name>: tail log of app with name <app_name>")
 print("output <app_name>: output log of app with name <app_name>")
@@ -41,6 +42,7 @@ while True:
         print("list: list running apps")
         print("start <app_name>: start app with name <app_name>")
         print("stop <app_name>: stop app with name <app_name>")
+        print("reload <app_name>: reload app with name <app_name>")
         print("build <app_name> [-s]: build app with name <app_name>, -s: silent")
         print("tail <app_name>: tail log of app with name <app_name>")
         print("output <app_name>: output log of app with name <app_name>")
@@ -89,6 +91,13 @@ while True:
             for a in apps:
                 if a.name == cmd_args[1]:
                     a.stop()
+
+    if cmd_args[0] == "reload":
+        if len(cmd_args) == 2:
+            # Get app
+            for a in apps:
+                if a.name == cmd_args[1]:
+                    a.restart()
 
     if cmd_args[0] == "build":
         if len(cmd_args) >= 2:

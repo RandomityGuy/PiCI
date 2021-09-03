@@ -1,4 +1,4 @@
-import os, subprocess, shlex, shutil, json, sys;
+import os, subprocess, shlex, shutil, json, sys, signal;
 from pici import outputstream;
 
 
@@ -89,17 +89,21 @@ class App:
     def start(self):
         print("PiCI: Starting app")
         self.setup_outputs()
-        self.startproc = subprocess.Popen([self.start_command], cwd='.pici/apps/' + self.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        self.startproc = subprocess.Popen([self.start_command], cwd='.pici/apps/' + self.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
         outputstream.append_process(self.startproc, self.stdout, self.stderr)
         print("PiCI: Started app")
 
     def stop(self):
         print("PiCI: Stopping app")
-        self.startproc.terminate()
+        os.killpg(os.getpgid(self.startproc.pid), signal.SIGTERM)
         self.startproc.wait()
         outputstream.wait_process_io(self.startproc)
         self.close_outputs()
         print("PiCI: Stopped app")
+
+    def restart(self):
+        self.stop()
+        self.start()
 
     def tail(self):
         outputstream.tail_process(self.startproc)
